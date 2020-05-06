@@ -10,19 +10,9 @@ import java.util.List;
 public class TwoNumAdd {
     public static void main(String[] args) {
         Solution solution = new Solution();
-        ListNode l1 = new ListNode(9);
-
-        ListNode l2 = new ListNode(1);
-        l2.next = new ListNode(9);
-        l2.next.next = new ListNode(9);
-        l2.next.next.next = new ListNode(9);
-        l2.next.next.next.next = new ListNode(9);
-        l2.next.next.next.next.next = new ListNode(9);
-        l2.next.next.next.next.next.next = new ListNode(9);
-        l2.next.next.next.next.next.next.next = new ListNode(9);
-        l2.next.next.next.next.next.next.next.next = new ListNode(9);
-        l2.next.next.next.next.next.next.next.next.next = new ListNode(9);
-        ListNode listNode = solution.addTwoNumbers(l1, l2);
+        ListNode l1 = getLinkedListByArray(new int[]{1, 8, 3});
+        ListNode l2 = getLinkedListByArray(new int[]{1, 2, 7});
+        ListNode listNode = solution.addTwoNumbers2(l1, l2);
         do {
             System.out.print(listNode.val + " -> ");
             listNode = listNode.next;
@@ -30,7 +20,65 @@ public class TwoNumAdd {
         System.out.println();
     }
 
+    public static ListNode getLinkedListByArray(int[] arr) {
+        if (arr == null || arr.length < 1) {
+            return null;
+        }
+        ListNode root = new ListNode(arr[0]);
+        ListNode currentNode = root;
+        for (int i = 1; i < arr.length; i++) {
+            currentNode.next = new ListNode(arr[i]);
+            currentNode = currentNode.next;
+        }
+        // 返回头节点
+        return root;
+    }
+
     static class Solution {
+        public ListNode addTwoNumbers2(ListNode l1, ListNode l2) {
+            ListNode root = null;
+            ListNode currentNode = null;
+            // 两数之和
+            int sum;
+            // 两数之和大于10，保留个位数，十位数计入下位累加
+            int addExtra = 0;
+            do {
+                // 根据位置取数，判断是否为空
+                int value1 = (l1 == null) ? 0 : l1.val;
+                int value2 = (l2 == null) ? 0 : l2.val;
+
+                // 两数相加，加上进位数，保留个位数，十位数计入下次累加
+                sum = value1 + value2 + addExtra;
+                addExtra = sum / 10;
+                int value = sum % 10;
+
+                // 将值加入链表中，并判断是否是根节点
+                if (root == null) {
+                    root = new ListNode(value);
+                    currentNode = root;
+                } else {
+                    currentNode.next = new ListNode(value);
+                    currentNode = currentNode.next;
+                }
+
+                // 下移一位
+                if (l1 != null) {
+                    l1 = l1.next;
+                }
+
+                if (l2 != null) {
+                    l2 = l2.next;
+                }
+            } while (l1 != null || l2 != null);
+
+            // 最后一位超出10，溢出一位
+            if (addExtra != 0) {
+                currentNode.next = new ListNode(addExtra);
+            }
+            return root;
+        }
+
+        // 方法2，存在溢出的问题
         public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
             long sum = transferListNodeToNum(l1) + transferListNodeToNum(l2);
             return transferNumToListNode(sum);
